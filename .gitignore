@@ -1,0 +1,10 @@
+.vscode
+.ipynb_checkpoints
+*.bz2
+*.txt
+*.npz
+__pycache__
+.DS_Store
+data
+wandb
+tokenizer
