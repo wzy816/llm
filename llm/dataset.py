@@ -65,6 +65,7 @@ def tokenize_txt_to_npz(data_dir, tokenizer, context_size, merge_level):
 
             for k in out:
                 total_tokens += len(out[k])
+                
             if out:
                 outfile = Path(fn).with_suffix(f'.{context_size}.npz')
                 np.savez(outfile, **out)

@@ -13,6 +13,7 @@ import torch.nn.functional as F
 import wandb
 from torch.optim import AdamW
 from torch.utils.data import DataLoader
+import yaml
 
 from llm.dataset import Dataset
 from llm.model import LLM
@@ -20,10 +21,10 @@ from llm.model import LLM
 
 @dataclass
 class Config:
-    # model
-    dim: int = 2048
-    num_layers: int = 28
-    num_heads: int = 16
+    # 117M model
+    dim: int = 768
+    num_layers: int = 12
+    num_heads: int = 12
 
     head_dim: int = dim // num_heads
     max_seq_len: int = 1024
@@ -33,21 +34,20 @@ class Config:
     sample_every: int = 256
 
     # train
-    batch_size: int = 16
+    batch_size: int = 32
     micro_batch_size: int = 100
     min_save_step: int = 20
     max_save_loss: float = 2.0
-    max_train_step: int = 2000
     min_train_lr: float = 1e-12
+    max_train_step: int = 2000
 
     # optimizer
-    lr: float = 3e-5
+    lr: float = 3e-4
     weight_decay: float = 0.1
     
     # ReduceLROnPlateau
     patience: int = 50
     factor: float = 0.1
-    cooldown: int = 0
         
     # placeholder
     total_params: str = ''
@@ -55,11 +55,11 @@ class Config:
 
 
 class Trainer():
-    def __init__(self, project, tokenizer, checkpoint_dir, data_dir, output_dir, init_step):
+    def __init__(self, project, tokenizer, checkpoint_dir, data_dir, output_dir, config, init_step):
         self.project = project
         self.name = datetime.datetime.now().strftime('%Y%m%d_%H%M%S')
 
-        self.config = Config()
+        self.config = config
         
         self.tokenizer = tokenizer
         self.config.vocab_size = self.tokenizer.vocab_size()
@@ -67,7 +67,7 @@ class Trainer():
 
         self.llm = LLM(self.config.vocab_size, self.padding_idx, self.config)
         if checkpoint_dir is not None:
-            state = torch.load(checkpoint_dir+'/weights.pt',
+            state = torch.load(checkpoint_dir+'/weighs.pt',
                                map_location='cuda:0')
             self.llm.load_state_dict(state, strict=False)
         else:
@@ -89,9 +89,7 @@ class Trainer():
         self.lr_scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(self.optimizer,
                                                                        patience=self.config.patience,
                                                                        factor=self.config.factor,
-                                                                       cooldown=self.config.cooldown,
-                                                                       eps=1e-12)
-        
+                                                                       eps=self.config.min_train_lr)
         self.output_dir = output_dir
         self.init_step = init_step
 
@@ -117,8 +115,6 @@ class Trainer():
 
         while True:
             lr = self.optimizer.param_groups[0]['lr']
-            if lr < self.config.min_train_lr:
-                break
 
             prev_loss = loss
             loss = 0
@@ -187,15 +183,25 @@ class Trainer():
 @click.option('data_dir', '--data_dir', required=True)
 @click.option('tokenizer_model_file', '--tokenizer_model_file', required=True)
 @click.option('output_dir', '--output_dir', required=True)
+@click.option('config_file', '--config_file', required=False)
 @click.option('checkpoint_dir', '--checkpoint_dir', required=False, default=None)
 @click.option('init_step', '--init_step', required=False, default=0)
-def main(project, data_dir, tokenizer_model_file, output_dir, checkpoint_dir, init_step):
+def main(project, data_dir, tokenizer_model_file, output_dir, config_file, checkpoint_dir, init_step):
     tokenizer = spm.SentencePieceProcessor(model_file=tokenizer_model_file)
     torch.set_default_device('cuda')
     torch.set_default_dtype(torch.float32)
     
+    config = Config()
+    if config_file is not None:
+        with open(config_file, 'r') as f:
+            try:
+                d = yaml.safe_load(f)
+                config = Config(**d)
+            except yaml.YAMLError as e:
+                print(e)
+    
     trainer = Trainer(project, tokenizer, checkpoint_dir,
-                      data_dir, output_dir, init_step)
+                      data_dir, output_dir, config, init_step)
     trainer.train()
 
 

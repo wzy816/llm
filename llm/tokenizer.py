@@ -23,9 +23,14 @@ def main(data_dir, model_prefix, model_type, vocab_size, max_sentence_length, in
             with open(os.path.join(directory, fn), 'r') as f:
                 for line in f.readlines():
                     line = line.strip()
-
+                    
+                    if len(line) == 0:
+                        continue
+                        
                     if len(line.encode()) > max_sentence_length:
                         parts = re.split("([.?!。？！])", line)
+                        
+                        # split line by parts, keep part
                         merged = []
                         for i in range(0, len(parts), 2):
                             p = parts[i]
@@ -33,6 +38,8 @@ def main(data_dir, model_prefix, model_type, vocab_size, max_sentence_length, in
                                 p = p+parts[i+1]
                             if len(p.encode()) <= max_sentence_length:
                                 merged.append(p)
+                                
+                        # merge adjacent sublines until max_sentence_length
                         if len(merged) > 0:
                             l = ''
                             for m in merged:
@@ -41,7 +48,6 @@ def main(data_dir, model_prefix, model_type, vocab_size, max_sentence_length, in
                                     l = ''
                                 l = l + m
                             yield l.encode()
-
                     else:
                         yield line.encode()
 
