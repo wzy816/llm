@@ -7,15 +7,15 @@ head_dim: 128
 max_seq_len: 1024
 
 # dataset
-context_size: 1024
+context_size: 2048
 sample_every: 256
 
 # train
-batch_size: 8
+batch_size: 4
 micro_batch_size: 200
 min_save_step: 20
-max_save_loss: 2.0
-max_train_step: 2000
+max_save_loss: 8.0
+max_train_step: 10000
 min_train_lr: 1.e-12
 
 # optimizer
@@ -23,7 +23,7 @@ lr: 1.e-4
 weight_decay:  0.1
 
 # ReduceLROnPlateau
-patience:  50
+patience:  200
 factor: 0.1
 
 # placeholder

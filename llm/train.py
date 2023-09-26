@@ -67,7 +67,7 @@ class Trainer():
 
         self.llm = LLM(self.config.vocab_size, self.padding_idx, self.config)
         if checkpoint_dir is not None:
-            state = torch.load(checkpoint_dir+'/weighs.pt',
+            state = torch.load(checkpoint_dir+'/weights.pt',
                                map_location='cuda:0')
             self.llm.load_state_dict(state, strict=False)
         else:

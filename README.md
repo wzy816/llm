@@ -26,7 +26,7 @@ Train a mini model to reserve a string. See [notebook](toyreverse.ipynb)
 
 ## Train on Scifi Novel Dataset
 
-Train a 117M/1.5B base model on ~4000 scifi novels in chinese.
+Train a 117M/1.5B base model on ~4000 scifi novels in chinese
 
 ```bash
 # Download https://huggingface.co/datasets/wzy816/scifi and and unzip to data/scifi.
@@ -48,13 +48,14 @@ python3 -m llm.train --project=llm_scifi --data_dir=/mnt/llm/data/scifi --tokeni
 
 # inference
 python3 -m llm.inference --checkpoint_dir=/mnt/llm_scifi/step={}_loss={} --tokenizer_model_file=/mnt/llm/tokenizer/scifi_16000.model --prompt='在越来越现代的社会里，科学其实是无处不在的，它随时随地与我们日常生活的一切，与我们所有人密切相关' --max_new_tokens=16
-# output ,因此,皇帝陛下虽然不复存在,但无法地在故乡的一面留恋
-
+# 因此，皇帝陛下虽然不复存在，但无法地在故乡的一面留恋
 ```
+
+![loss](images/llm_scifi_loss.png)
 
 ## Train on zhwiki Dataset
 
-Train a 2.46B base model on cleaned zhwiki dump data.
+Train a 2.46B base model on cleaned zhwiki dump data. (1e9-6e9 tokens)
 
 ```bash
 # Download https://huggingface.co/datasets/wzy816/zhwiki_20230701 and unzip to data/zhwiki.
@@ -63,15 +64,17 @@ Train a 2.46B base model on cleaned zhwiki dump data.
 python3 -m llm.tokenizer --data_dir=/mnt/llm/data/zhwiki --model_prefix=/mnt/llm/tokenizer/zhwiki_16000 --vocab_size=16000
 
 # prepare train dataset
-python3 -m llm.dataset --data_dir=/mnt/llm/data/zhwiki --tokenizer_model_file=/mnt/llm/tokenizer/zhwiki_16000.model --context_size=1024
+python3 -m llm.dataset --data_dir=/mnt/llm/data/zhwiki --tokenizer_model_file=/mnt/llm/tokenizer/zhwiki_16000.model --context_size=2048
 
 # train 2.46B model
 python3 -m llm.train --project=llm_zhwiki --data_dir=/mnt/llm/data/zhwiki --tokenizer_model_file=/mnt/llm/tokenizer/zhwiki_16000.model --output_dir=/mnt/llm_zhwiki --config_file=/mnt/llm/config/zhwiki_2.46B.yaml
 
 # inference
-python3 -m llm.inference --checkpoint_dir=/mnt/llm_zhwiki/step={}_loss={} --tokenizer_model_file=/mnt/llm/tokenizer/zhwiki_16000.model --prompt='' --max_new_tokens=16
-
+python3 -m llm.inference --checkpoint_dir=/mnt/llm_zhwiki/step={}_loss={} --tokenizer_model_file=/mnt/llm/tokenizer/zhwiki_16000.model --prompt='在越来越现代的社会里，科学其实是无处不在的，它随时随地与我们日常生活的一切，与我们所有人密切相关' --max_new_tokens=16
+# 。前世唯有宗教在东方亚述教会中深受循道宗
 ```
+
+![loss](images/llm_zhwiki_loss.png)
 
 ## Reference
 
