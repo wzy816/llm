@@ -4,7 +4,7 @@ num_layers: 30
 num_heads: 20
 
 head_dim: 128
-max_seq_len: 1024
+max_seq_len: 2048
 
 # dataset
 context_size: 2048
@@ -23,7 +23,7 @@ lr: 1.e-4
 weight_decay:  0.1
 
 # ReduceLROnPlateau
-patience:  200
+patience:  100
 factor: 0.1
 
 # placeholder

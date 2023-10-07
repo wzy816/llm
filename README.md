@@ -71,7 +71,7 @@ python3 -m llm.train --project=llm_zhwiki --data_dir=/mnt/llm/data/zhwiki --toke
 
 # inference
 python3 -m llm.inference --checkpoint_dir=/mnt/llm_zhwiki/step={}_loss={} --tokenizer_model_file=/mnt/llm/tokenizer/zhwiki_16000.model --prompt='在越来越现代的社会里，科学其实是无处不在的，它随时随地与我们日常生活的一切，与我们所有人密切相关' --max_new_tokens=16
-# 。前世唯有宗教在东方亚述教会中深受循道宗
+# 。谎言的完整性和启蒙爱被看作是一种理性的伦理
 ```
 
 ![loss](images/llm_zhwiki_loss.png)
